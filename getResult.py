@@ -29,5 +29,6 @@ def getResult(content):
     return result
 
 if __name__ == '__main__':
-    content = input('输入需要翻译的内容：')
-    print(getResult(content))
+    while True:
+        content = input('输入需要翻译的内容：')
+        print(getResult(content))
