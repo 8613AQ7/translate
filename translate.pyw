@@ -17,6 +17,8 @@ def showcontent():
 def showresult():
     content = text1.get(0.0 , END)
     content = content.replace('\n','#')  #解决换行问题1
+    if content.count('#') == 1:     #带符号单词会无法获得翻译结果
+        content = content[:-1]
     result = getResult(content)
     text2.delete(0.0 , END)
     text2.insert(0.0 , result)
