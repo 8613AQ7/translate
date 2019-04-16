@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk,LabelFrame,Scrollbar,RIGHT,Y,Text,LEFT,Button,Menu,mainloop,END,messagebox
 from tkinter import filedialog
 from tkinter import messagebox
 from getResult import getResult
@@ -19,9 +19,18 @@ def showresult():
     content = content.replace('\n','#')  #解决换行问题1
     if content.count('#') == 1:     #带符号单词会无法获得翻译结果
         content = content[:-1]
-    result = getResult(content)
-    text2.delete(0.0 , END)
-    text2.insert(0.0 , result)
+
+    if not content == '':   #防止错判网络连接问题
+        ans = 1
+        while ans :
+            result = getResult(content)
+            if result == '':
+                ans = messagebox.askretrycancel('错误！','连接超时！请检查网络设置')
+            else:
+                ans = 0
+            
+        text2.delete(0.0 , END)
+        text2.insert(0.0 , result)
 
 def saveresult():
     fileName = filedialog.asksaveasfilename() + '.txt'
