@@ -1,7 +1,41 @@
 from tkinter import Tk,LabelFrame,Scrollbar,RIGHT,Y,Text,LEFT,Button,Menu,mainloop,END,messagebox
 from tkinter import filedialog
 from tkinter import messagebox
-from getResult import getResult
+from urllib.request import urlopen
+from urllib.parse import urlencode
+from json import loads
+
+def getResult(content):
+    url = 'http://fy.iciba.com/ajax.php?a=fy'#翻译网站
+    
+    data={}                             #给网站递交的post内容
+    data['f'] = 'auto'
+    data['t'] = 'auto'
+    data['w'] = content
+    data = urlencode(data).encode('utf-8')
+    result = ''
+    post = True
+    while post:
+        try:
+            response = urlopen(url,data,timeout=4)
+        except:
+            post = messagebox.askretrycancel('错误！','连接超时！请检查网络设置')
+        else:
+            post = False
+            html = response.read().decode('utf-8')
+            html = loads(html)
+            part = html['content']
+            if not part:        #某些词语+符号的组合 网站不显示翻译结果
+                messagebox.showerror('错误！','翻译失败=-=')
+            else:
+                if 'word_mean' in part: #单词
+                    result = part['word_mean'][0][:-1]
+                else:                   #句子
+                    result = part['out']
+
+    result = result.replace('#','\n')    #解决换行问题2
+
+    return result
 
 def clear():
     text1.delete(0.0,END)
@@ -10,9 +44,12 @@ def clear():
 def showcontent():
     fileName = filedialog.askopenfilename()
     if fileName!='':
-        with open(fileName,'r') as f:
-            content = f.read()
-        text1.insert(0.0 , content)
+        try:
+            with open(fileName,'r') as f:
+                content = f.read()
+            text1.insert(0.0 , content)
+        except:
+            messagebox.showwarning('警告！','请打开文本文件')
          
 def showresult():
     content = text1.get(0.0 , END)
@@ -20,17 +57,10 @@ def showresult():
     if content.count('#') == 1:     #带符号单词会无法获得翻译结果
         content = content[:-1]
 
-    if not content == '':   #防止错判网络连接问题
-        ans = 1
-        while ans :
-            result = getResult(content)
-            if result == '':
-                ans = messagebox.askretrycancel('错误！','连接超时！请检查网络设置')
-            else:
-                ans = 0
+    result = getResult(content)
             
-        text2.delete(0.0 , END)
-        text2.insert(0.0 , result)
+    text2.delete(0.0 , END)
+    text2.insert(0.0 , result)
 
 def saveresult():
     fileName = filedialog.asksaveasfilename() + '.txt'
