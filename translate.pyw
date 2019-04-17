@@ -70,7 +70,7 @@ def saveresult():
 
 
 root=Tk()
-root.title("翻译/Traslation")
+root.title("翻译")
 
 frame1 = LabelFrame(root,text = "请在此输入需要翻译的内容")
 frame1.grid(column = 0,row = 0,padx = 10,pady = 10)
